@@ -1,17 +1,16 @@
 package com.xml.analyzer
 
 import java.io.File
-
 import com.agileengine.xml.JsoupFindByIdSnippet
 import com.typesafe.scalalogging.LazyLogging
-import org.jsoup.nodes.{Attributes, Element}
-
-import scala.annotation.tailrec
+import org.jsoup.nodes.{Element, Node}
 import scala.util.Try
 
 class AnalyzerTwoPages() extends LazyLogging {
 
-  def analyze(inpOriginPath: String, inpOtherPath: String) = {
+  val buf = scala.collection.mutable.ArrayBuffer.empty[Node]
+
+  def analyze(inpOriginPath: String, inpOtherPath: String): Try[Vector[Node]] = {
 
     Try {
 
@@ -20,23 +19,15 @@ class AnalyzerTwoPages() extends LazyLogging {
 
       if (checkFile(inpOriginFile) && checkFile(inpOtherFile)) {
 
-        JsoupFindByIdSnippet.findElementById(inpOriginFile, AnalyzerTwoPages.idElement).map(element => {
-
-          val rootOtherElement: Try[Element] = JsoupFindByIdSnippet.findElementById(inpOtherFile, AnalyzerTwoPages.idRootElement)
-          val resultInvestigation: Try[Element] = rootOtherElement.map(otherElement => analyzeElement(otherElement.children().last(), element))
-
-          resultInvestigation.getOrElse(Try {
-            ""
-          })
+        JsoupFindByIdSnippet.findElementById(inpOriginFile, AnalyzerTwoPages.idElement).map(targetElement => {
+          JsoupFindByIdSnippet.findElementById(inpOtherFile, AnalyzerTwoPages.idRootElement)
+            .map(rootOtherElement => analyzeElement(rootOtherElement, targetElement))
         }
         )
-
-      } else {
-        ""
       }
 
+      buf.toVector
     }
-
   }
 
 
@@ -46,26 +37,33 @@ class AnalyzerTwoPages() extends LazyLogging {
     res
   }
 
-  @tailrec
-  private def analyzeElement(element: Element, origElement: Element): Element = {
-    if (element.lastElementSibling().hasParent) {
-      analyzeElement(element.lastElementSibling(), origElement)
-    } else {
-      val origAttrs: Attributes = origElement.attributes()
+  private def analyzeElement(node: Node, origElement: Element): Unit = {
 
-      //TODO need to realize logic for comparing of origin element with other element
-      //Just Stub now
-      element
+    logger.debug(node.toString)
+
+    if (node.attr("class").contains("btn")) {
+      buf += node
     }
 
+    if (node.isInstanceOf[Element]) {
+      val childs = node.childNodes()
+      if (!childs.isEmpty) {
+        (0 until childs.size()).foreach(i =>
+          analyzeElement(node.childNode(i), origElement)
+        )
+      }
+    }
 
+    // if(node.attributes().get("id") != AnalyzerTwoPages.idRootElement){
+    //   if ( node.hasParent) {
+    //      analyzeElement(node.parent(), origElement)
+    //   }
+    // }
   }
-
 
 }
 
 object AnalyzerTwoPages {
-
   val idRootElement = "wrapper"
   val idElement = "make-everything-ok-button"
 
