@@ -10,7 +10,7 @@ object Analyzer extends App with LazyLogging {
   } else {
 
     AnalyzerTwoPages().analyze(args(0), args(1)) match {
-      case Success(v) => logger.info(v.toString)
+      case Success(v) => logger.info(s"Found similar elements (${v.length}): \n  ${v.mkString("\n")}")
       case Failure(ex) => logger.error(s"Error during working of program ${ex.getMessage}")
     }
 

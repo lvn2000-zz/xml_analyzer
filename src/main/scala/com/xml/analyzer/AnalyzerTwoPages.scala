@@ -39,11 +39,8 @@ class AnalyzerTwoPages() extends LazyLogging {
 
   private def analyzeElement(node: Node, origElement: Element): Unit = {
 
-    logger.debug(node.toString)
-
-    if (node.attr("class").contains("btn")) {
-      buf += node
-    }
+    //logger.debug(node.toString)
+    if (checkSimilarity(node, origElement)) buf += node
 
     if (node.isInstanceOf[Element]) {
       val childs = node.childNodes()
@@ -54,11 +51,12 @@ class AnalyzerTwoPages() extends LazyLogging {
       }
     }
 
-    // if(node.attributes().get("id") != AnalyzerTwoPages.idRootElement){
-    //   if ( node.hasParent) {
-    //      analyzeElement(node.parent(), origElement)
-    //   }
-    // }
+  }
+
+  private def checkSimilarity(node: Node, origElement: Element): Boolean = {
+    node.attr("class").contains(origElement.attr("class")) ||
+      node.attr("title").contains(origElement.attr("title")) ||
+      node.attr("href").contains(origElement.attr("href"))
   }
 
 }
