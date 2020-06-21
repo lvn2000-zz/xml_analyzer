@@ -1,10 +1,13 @@
 package com.xml.analyzer
 
 import java.io.File
+
+import scala.util.Try
+
+import org.jsoup.nodes.{ Element, Node }
+
 import com.agileengine.xml.JsoupFindByIdSnippet
 import com.typesafe.scalalogging.LazyLogging
-import org.jsoup.nodes.{Element, Node}
-import scala.util.Try
 
 class AnalyzerTwoPages() extends LazyLogging {
 
@@ -28,14 +31,12 @@ class AnalyzerTwoPages() extends LazyLogging {
           Jsoup.parse(inpOtherFile, "UTF-8").body().childNodes().asScala.toList
             .foreach(n => analyzeElement(n, targetElement))
 
-        }
-        )
+        })
       }
 
       buf.toVector
     }
   }
-
 
   private def checkFile(f: File): Boolean = {
     val res = f.exists() && f.canRead
@@ -52,17 +53,25 @@ class AnalyzerTwoPages() extends LazyLogging {
       val childs = node.childNodes()
       if (!childs.isEmpty) {
         (0 until childs.size()).foreach(i =>
-          analyzeElement(node.childNode(i), origElement)
-        )
+          analyzeElement(node.childNode(i), origElement))
       }
     }
 
   }
 
   private def checkSimilarity(node: Node, origElement: Element): Boolean = {
-    node.attr("class").contains(origElement.attr("class")) ||
-      node.attr("title").contains(origElement.attr("title")) ||
-      node.attr("href").contains(origElement.attr("href"))
+
+    //    node.attr("class").contains(origElement.attr("class")) ||
+    //      node.attr("title").contains(origElement.attr("title")) ||
+    //      node.attr("href").contains(origElement.attr("href"))
+
+    var i = 0
+    val iter = origElement.attributes().iterator()
+    while (iter.hasNext()) {
+      val attr = iter.next()
+      if (node.attr(attr.getKey).contains(attr.getValue)) i = i + 1
+    }
+    i > 2
   }
 
 }
