@@ -26,7 +26,7 @@ class AnalyzerTwoPages() extends LazyLogging {
           import scala.collection.JavaConverters._
 
           Jsoup.parse(inpOtherFile, "UTF-8").body().childNodes().asScala.toList
-            .map(n => analyzeElement(n, targetElement))
+            .foreach(n => analyzeElement(n, targetElement))
 
         }
         )
