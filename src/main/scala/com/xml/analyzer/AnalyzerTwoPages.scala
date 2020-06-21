@@ -19,9 +19,15 @@ class AnalyzerTwoPages() extends LazyLogging {
 
       if (checkFile(inpOriginFile) && checkFile(inpOtherFile)) {
 
+        buf.clear()
         JsoupFindByIdSnippet.findElementById(inpOriginFile, AnalyzerTwoPages.idElement).map(targetElement => {
-          JsoupFindByIdSnippet.findElementById(inpOtherFile, AnalyzerTwoPages.idRootElement)
-            .map(rootOtherElement => analyzeElement(rootOtherElement, targetElement))
+
+          import org.jsoup.Jsoup
+          import scala.collection.JavaConverters._
+
+          Jsoup.parse(inpOtherFile, "UTF-8").body().childNodes().asScala.toList
+            .map(n => analyzeElement(n, targetElement))
+
         }
         )
       }
@@ -62,7 +68,6 @@ class AnalyzerTwoPages() extends LazyLogging {
 }
 
 object AnalyzerTwoPages {
-  val idRootElement = "wrapper"
   val idElement = "make-everything-ok-button"
 
   def apply() = new AnalyzerTwoPages()
