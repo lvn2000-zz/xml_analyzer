@@ -67,7 +67,7 @@ class AnalyzerTwoPages() extends LazyLogging {
 
     var i = 0
     val iter = origElement.attributes().iterator()
-    while (iter.hasNext()) {
+    while (iter.hasNext) {
       val attr = iter.next()
       if (node.attr(attr.getKey).contains(attr.getValue)) i = i + 1
     }
