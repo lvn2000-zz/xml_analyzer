@@ -14,7 +14,7 @@ lazy val root = (project in file(".")).
      assemblyJarName in assembly := "xml_analyzer.jar",
      mainClass in assembly := Some("com.xml.analyzer.Analyzer"),
      name := "xml_analyzer",
-     libraryDependencies ++= Seq(scalaTest, jsoup, logger, logbackCore, logbackClassic)
+     libraryDependencies ++= Seq(scalaTest, jsoup, logger, logbackCore, logbackClassic, typesafeconfig)
   )
 
 

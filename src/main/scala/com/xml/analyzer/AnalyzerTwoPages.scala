@@ -2,8 +2,10 @@ package com.xml.analyzer
 
 import java.io.File
 
+import scala.collection.JavaConverters.asScalaBufferConverter
 import scala.util.Try
 
+import org.jsoup.Jsoup
 import org.jsoup.nodes.{ Element, Node }
 
 import com.agileengine.xml.JsoupFindByIdSnippet
@@ -23,10 +25,7 @@ class AnalyzerTwoPages() extends LazyLogging {
       if (checkFile(inpOriginFile) && checkFile(inpOtherFile)) {
 
         buf.clear()
-        JsoupFindByIdSnippet.findElementById(inpOriginFile, AnalyzerTwoPages.idElement).map(targetElement => {
-
-          import org.jsoup.Jsoup
-          import scala.collection.JavaConverters._
+        JsoupFindByIdSnippet.findElementById(inpOriginFile, Analyzer.idElement).map(targetElement => {
 
           Jsoup.parse(inpOtherFile, "UTF-8").body().childNodes().asScala.toList
             .foreach(n => analyzeElement(n, targetElement))
@@ -61,10 +60,6 @@ class AnalyzerTwoPages() extends LazyLogging {
 
   private def checkSimilarity(node: Node, origElement: Element): Boolean = {
 
-    //    node.attr("class").contains(origElement.attr("class")) ||
-    //      node.attr("title").contains(origElement.attr("title")) ||
-    //      node.attr("href").contains(origElement.attr("href"))
-
     var i = 0
     val iter = origElement.attributes().iterator()
     while (iter.hasNext) {
@@ -77,8 +72,6 @@ class AnalyzerTwoPages() extends LazyLogging {
 }
 
 object AnalyzerTwoPages {
-  val idElement = "make-everything-ok-button"
-
   def apply() = new AnalyzerTwoPages()
 }
 
